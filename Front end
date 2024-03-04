@@ -1,0 +1,79 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, searchTerm]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`/adduser?page=${currentPage}&search=${searchTerm}`);
+      setData(response.data.data);
+      setTotalCount(response.data.totalCount);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleSearch = event => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handlePageChange = page => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <div>
+      <h1>PostgreSQL Data</h1>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>sno</th>
+            <th>customer_name</th>
+            <th>age</th>
+            <th>phone</th>
+            <th>location</th>
+            <th>created_at</th>
+            {/* Add more table headers as per your columns */}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map(item => (
+            <tr key={item.sno}>
+              <td>{item.customer_name}</td>
+              <td>{item.age}</td>
+              <td>{item.phone}</td>
+              <td>{item.location}</td>
+              <td>{item.created_at}</td>
+              {/* Render additional table data */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div>
+        {/* Pagination logic */}
+        {Array.from({ length: Math.ceil(totalCount / 20) }).map((_, index) => (
+          <button key={index + 1} onClick={() => handlePageChange(index + 1)}>
+            {index + 1}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
