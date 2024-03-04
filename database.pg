@@ -1,0 +1,20 @@
+const {  Client } = require('pg')
+
+const client = new Client({
+  user: 'postgres',
+  password: 'tejas',
+  host: 'localhost',
+  port: 5432,
+  database: 'yt_newapp'
+});
+
+client.connect();
+
+client.query(`Select * from accounts`,(err, res) =>{
+  if(!err){
+    console.log(res.rows)
+  }else{
+    console.log(err.message)
+  }
+  client.end;
+})
